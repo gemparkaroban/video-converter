@@ -8,8 +8,6 @@ import {
   VIDEO_COMPLETE
 } from './types';
 
-// TODO: Communicate to MainWindow process that videos
-// have been added and are pending conversion
 export const addVideos = videos => dispatch => {
   ipcRenderer.send('videos:added', videos);
   ipcRenderer.on('metadata:complete', (event, videosWithData) => {
@@ -17,11 +15,17 @@ export const addVideos = videos => dispatch => {
   });
 };
 
-// TODO: Communicate to MainWindow that the user wants
-// to start converting videos.  Also listen for feedback
-// from the MainWindow regarding the current state of
-// conversion.
-export const convertVideos = () => (dispatch, getState) => {};
+export const convertVideos = videos => dispatch => {
+  ipcRenderer.send('conversion:start', videos);
+
+  ipcRenderer.on('conversion:end', (event, { video, outputPath }) => {
+    dispatch({ type: VIDEO_COMPLETE, payload: { ...video, outputPath } });
+  });
+
+  ipcRenderer.on('conversion:progress', (event, { video, timemark }) => {
+    dispatch({ type: VIDEO_PROGRESS, payload: { ...video, timemark } });
+  });
+};
 
 // TODO: Open the folder that the newly created video
 // exists in
