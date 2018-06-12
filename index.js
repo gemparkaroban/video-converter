@@ -48,3 +48,7 @@ ipcMain.on('conversion:start', (event, videos) => {
       .run();
   });
 });
+
+ipcMain.on('folder:open', (event, outputPath) => {
+  shell.showItemInFolder(outputPath);
+});
