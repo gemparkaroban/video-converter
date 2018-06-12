@@ -3,9 +3,9 @@
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An electron desktop app to convert videos.
+A electron desktop app to convert videos.
 
-![tasky](https://goo.gl/sjb1Vc)
+![video-converter](https://user-images.githubusercontent.com/11765228/41272573-43163602-6e48-11e8-9e43-e79a93bfedd3.png)
 
 ## Getting Started
 
