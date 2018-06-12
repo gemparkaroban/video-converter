@@ -2,9 +2,51 @@ const electron = require('electron');
 const ffmpeg = require('fluent-ffmpeg');
 const _ = require('lodash');
 
-const { app, BrowserWindow, ipcMain, shell } = electron;
+const { app, BrowserWindow, ipcMain, shell, Menu } = electron;
 
 let mainWindow;
+
+const menuTemplate = [
+  {
+    label: 'File',
+    submenu: [
+      {
+        label: 'Start',
+        click() {
+          mainWindow.webContents.send('conversion:start');
+        }
+      },
+      {
+        label: 'Quit',
+        accelerator: process.platform === 'darwin' ? 'Command+Q' : 'Ctrl+Q',
+        click() {
+          app.quit();
+        }
+      }
+    ]
+  }
+];
+
+if (process.platform === 'darwin') {
+  menuTemplate.unshift({});
+}
+
+if (process.env.NODE_ENV !== 'production') {
+  menuTemplate.push({
+    label: 'View',
+    submenu: [
+      { role: 'reload' },
+      {
+        label: 'Toggle Developer Tools',
+        accelerator:
+          process.platform === 'darwin' ? 'Command+Alt+I' : 'Ctrl+Shift+I',
+        click(item, focusedWindow) {
+          focusedWindow.toggleDevTools();
+        }
+      }
+    ]
+  });
+}
 
 app.on('ready', () => {
   mainWindow = new BrowserWindow({
@@ -13,6 +55,9 @@ app.on('ready', () => {
     webPreferences: { backgroundThrottling: false }
   });
   mainWindow.loadURL(`file://${__dirname}/src/index.html`);
+  mainWindow.on('closed', () => app.quit());
+  const mainMenu = Menu.buildFromTemplate(menuTemplate);
+  Menu.setApplicationMenu(mainMenu);
 });
 
 ipcMain.on('videos:added', (event, videos) => {
@@ -32,6 +77,8 @@ ipcMain.on('videos:added', (event, videos) => {
 });
 
 ipcMain.on('conversion:start', (event, videos) => {
+  console.log('videos', videos);
+
   _.each(videos, video => {
     const outputDirectory = video.path.split(video.name)[0];
     const outputName = video.name.split('.')[0];
